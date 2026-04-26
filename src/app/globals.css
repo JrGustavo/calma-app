@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Calma Design System
+   Low-stimulus palette for ADHD-friendly learning
+   ============================================================ */
+
+:root {
+  /* Backgrounds — NEVER pure white */
+  --bg-primary: #F5F1E8;
+  --bg-secondary: #ECE8DD;
+  --bg-alt: #E8E8E5;
+  --bg-elevated: #EFEAE0;
+
+  /* Text — NEVER pure black */
+  --text-primary: #2C2C2C;
+  --text-secondary: #5A5A5A;
+  --text-muted: #7A7A7A;
+
+  /* Petroleum Blue — RESERVED for grammar markers ONLY */
+  --grammar-marker: #1F4E5F;
+  --grammar-marker-hover: #2C6478;
+  --grammar-marker-bg: rgba(31, 78, 95, 0.08);
+
+  /* Semantic colors — desaturated, sparing use */
+  --success-muted: #6B8E6F;
+  --warning-muted: #B8860B;
+  --border-subtle: #D4CFC4;
+  --border-default: #C4BFB4;
+
+  /* System accent (Focus Mode indicator) — same as grammar marker */
+  --system-accent: #1F4E5F;
+
+  /* Cognitive battery defaults */
+  --font-scale: 1;
+}
+
+/* Contrast modes (controlled by data-contrast attribute on <html>) */
+[data-contrast="medium"] {
+  --bg-primary: #F0EBDD;
+  --bg-secondary: #E5E0D2;
+  --text-primary: #1F1F1F;
+  --text-secondary: #4A4A4A;
+  --border-default: #B0AB9F;
+}
+
+[data-contrast="high"] {
+  --bg-primary: #EAE4D2;
+  --bg-secondary: #DCD6C4;
+  --text-primary: #141414;
+  --text-secondary: #383838;
+  --border-default: #8A8578;
+  --border-subtle: #A8A398;
+}
+
+/* Reduce motion — disables transitions and animations */
+[data-reduce-motion="true"] *,
+[data-reduce-motion="true"] *::before,
+[data-reduce-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Respect system-level preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Base styles */
+html {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Atkinson Hyperlegible', system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* Selection styling — neutral, not jarring */
+::selection {
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+/* Focus visible — clear but not garish */
+*:focus-visible {
+  outline: 2px solid var(--text-secondary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Disable focus ring on mouse use */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
