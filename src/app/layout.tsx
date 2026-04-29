@@ -1,5 +1,13 @@
 import type { Metadata, Viewport } from 'next';
+import { Atkinson_Hyperlegible } from 'next/font/google';
 import './globals.css';
+
+const atkinson = Atkinson_Hyperlegible({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-atkinson',
+});
 
 export const metadata: Metadata = {
   title: 'Calma — Aprende inglés con calma',
@@ -23,23 +31,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" data-contrast="soft" data-reduce-motion="false">
-      <head>
-        <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-        />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="bg-bg-primary text-text-primary antialiased">
+    <html
+      lang="es"
+      data-contrast="soft"
+      data-reduce-motion="false"
+      className={atkinson.variable}
+    >
+      <body className="bg-bg-primary text-text-primary antialiased font-sans">
         {children}
       </body>
     </html>

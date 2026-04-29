@@ -37,6 +37,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
+          'var(--font-atkinson)',
           'Atkinson Hyperlegible',
           'system-ui',
           '-apple-system',

@@ -2,120 +2,163 @@
 
 Aplicación web de bajo estímulo para aprendizaje de inglés diseñada para niños con TDAH. Construida como andamiaje externo para funciones ejecutivas: lecciones cortas, control sobre el ritmo de los estímulos, y herramientas de regulación cognitiva.
 
-> **Estado actual: Fase 1 completa.** Sistema de diseño, paleta crema/petróleo, panel de batería cognitiva y componente `<GrammarMarker>` funcionando. Backend (Supabase) y autenticación se implementan en Fase 2.
+> **Estado actual: Fase 2 completa.** Sistema de diseño + Supabase backend + autenticación + sincronización de preferencias cognitivas. Próxima fase: módulo de aprendizaje del estudiante.
 
 ## Stack
 
 - **Next.js 14** (App Router) + TypeScript estricto
 - **Tailwind CSS** con design tokens personalizados
-- **Zustand** para preferencias cognitivas
-- **Atkinson Hyperlegible** como tipografía (Google Fonts)
-- **Lucide** para iconografía consistente
+- **Supabase** (Auth + PostgreSQL + RLS)
+- **Zustand** para preferencias cognitivas (sincronizadas con Supabase)
+- **Atkinson Hyperlegible** como tipografía
 - Despliegue: **Vercel**
 
-## Empezar localmente
+## Setup local
+
+### 1. Clonar / descomprimir
 
 ```bash
-# 1. Instalar dependencias
+unzip calma-app-phase2.zip
+cd calma-app
 npm install
-
-# 2. Levantar servidor de desarrollo
-npm run dev
-
-# 3. Abrir el navegador
-open http://localhost:3000
 ```
 
-Visita `/showcase` para ver el sistema de diseño completo y validar:
-- Paleta de colores
-- Marcadores gramaticales (`<GrammarMarker>`)
-- Botones y tarjetas
-- Tipografía
-- Panel de batería cognitiva (icono de engrane arriba a la derecha)
+### 2. Configurar Supabase
 
-## Verificar el build
+a) Crea un proyecto en [supabase.com](https://supabase.com).
+
+b) Aplica el schema:
+- En Supabase Dashboard → **SQL Editor** → **New query**
+- Pega el contenido de `supabase/migrations/001_initial_schema.sql`
+- Click **Run**
+
+c) Configura Auth:
+- **Authentication → Providers → Email**: desactiva "Confirm email" (en desarrollo)
+- **Authentication → URL Configuration → Site URL**: `http://localhost:3000`
+- **Authentication → URL Configuration → Redirect URLs**: agrega `http://localhost:3000/**`
+
+d) Copia tus credenciales desde **Project Settings → API**:
+
+```bash
+cp .env.example .env.local
+# edita .env.local con tus 3 credenciales
+```
+
+### 3. Levantar dev server
+
+```bash
+npm run dev
+```
+
+Abre `http://localhost:3000`. Crea cuenta, prueba login, panel de batería cognitiva, etc.
+
+### 4. Verificar el build
 
 ```bash
 npm run build
 npm run type-check
-npm run lint
 ```
 
-Los tres comandos deben pasar sin errores antes de hacer deploy.
+Los dos deben pasar sin errores antes de hacer deploy.
 
-## Desplegar en Vercel
+## Despliegue en Vercel
 
-### Opción A — desde la terminal (recomendado)
+### Variables de entorno en Vercel
 
-```bash
-# 1. Instalar Vercel CLI (una sola vez)
-npm install -g vercel
+En tu dashboard de Vercel → Settings → Environment Variables, agrega:
 
-# 2. Iniciar sesión en Vercel (abre el navegador)
-vercel login
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
 
-# 3. Deploy a preview
-vercel
+### Actualizar URLs en Supabase
 
-# 4. Deploy a producción
-vercel --prod
-```
+Tras el deploy, ve a Supabase → **Authentication → URL Configuration** y agrega:
+- **Site URL**: tu URL de producción (ej. `https://calma-app.vercel.app`)
+- **Redirect URLs**: agrega `https://calma-app.vercel.app/**`
 
-Vercel detecta automáticamente que es Next.js — no requiere configuración adicional para Fase 1 (no hay variables de entorno todavía).
-
-### Opción B — desde GitHub
-
-1. Crea un repositorio nuevo en GitHub
-2. `git init && git add . && git commit -m "Phase 1: design system"`
-3. `git remote add origin <url-de-tu-repo> && git push -u origin main`
-4. En [vercel.com/new](https://vercel.com/new), importa el repo
-5. Vercel detecta Next.js automáticamente, click en "Deploy"
+Sin esto, el login en producción fallará silenciosamente.
 
 ## Estructura del proyecto
 
 ```
-src/
-├── app/
-│   ├── globals.css          # CSS variables del design system
-│   ├── layout.tsx           # Root layout con tipografía y data-attrs
-│   ├── page.tsx             # Landing minimalista
-│   └── showcase/
-│       └── page.tsx         # Validación visual del sistema de diseño
-├── components/
-│   ├── lesson/
-│   │   └── GrammarMarker.tsx        # ÚNICO uso permitido de azul petróleo
-│   ├── settings/
-│   │   └── CognitiveBatteryPanel.tsx # Panel de control cognitivo
-│   └── ui/
-│       ├── Button.tsx
-│       └── Card.tsx
-├── lib/
-│   └── utils.ts             # cn() para merge de clases
-└── stores/
-    └── preferences.ts       # Zustand store con persistencia local
+calma-app/
+├── supabase/
+│   ├── migrations/
+│   │   └── 001_initial_schema.sql    # Schema completo + RLS + triggers
+│   └── README.md
+├── src/
+│   ├── app/
+│   │   ├── (auth)/                    # Grupo de rutas sin layout protegido
+│   │   │   ├── login/page.tsx
+│   │   │   ├── signup/page.tsx
+│   │   │   └── logout/route.ts
+│   │   ├── student/dashboard/page.tsx
+│   │   ├── teacher/dashboard/page.tsx
+│   │   ├── parent/dashboard/page.tsx
+│   │   ├── showcase/page.tsx          # Sistema de diseño
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx                   # Landing
+│   ├── components/
+│   │   ├── auth/
+│   │   │   ├── LogoutButton.tsx
+│   │   │   └── PreferencesHydrator.tsx
+│   │   ├── lesson/
+│   │   │   └── GrammarMarker.tsx
+│   │   ├── settings/
+│   │   │   └── CognitiveBatteryPanel.tsx
+│   │   └── ui/
+│   │       ├── Button.tsx
+│   │       └── Card.tsx
+│   ├── lib/
+│   │   ├── supabase/
+│   │   │   ├── client.ts              # Browser client
+│   │   │   ├── server.ts              # Server client
+│   │   │   └── middleware.ts          # Auth refresh + route protection
+│   │   └── utils.ts
+│   ├── stores/
+│   │   └── preferences.ts             # Zustand + Supabase sync
+│   ├── types/
+│   │   └── database.ts                # TS types del schema
+│   └── middleware.ts                  # Next.js middleware
+├── package.json
+├── tailwind.config.ts
+└── README.md
 ```
 
-## Reglas del sistema de diseño
+## Reglas inmutables del sistema de diseño
 
-Estas reglas son **inmutables**. Cualquier cambio futuro debe respetarlas:
-
-1. **No usar `#FFFFFF` (blanco puro) en ningún lugar.** El fondo base es `#F5F1E8` (crema suave).
+1. **No usar `#FFFFFF` (blanco puro)** en ningún lugar. Fondo base: `#F5F1E8`.
 2. **El azul petróleo (`#1F4E5F`) está reservado.** Solo se usa en:
-   - El componente `<GrammarMarker>` para resaltar estructuras gramaticales en texto en inglés
+   - El componente `<GrammarMarker>` para marcar gramática en texto en inglés
    - El indicador "Modo Enfoque Activo" durante lecciones
-3. **Sin animaciones distractoras.** Solo transiciones de color (200ms máx) y barras de progreso. Todo debe respetar `prefers-reduced-motion` y el toggle del panel.
-4. **Tap targets mínimos de 44px** en todos los elementos interactivos.
-5. **Líneas de texto máximo 65 caracteres** para reducir saturación visual.
-6. **Una tarea por pantalla** durante las lecciones (Fase 2+).
+3. **Sin animaciones distractoras.** Solo transiciones de 200ms y barras de progreso. Todo respeta `prefers-reduced-motion` y el toggle.
+4. **Tap targets mínimos de 44px.**
+5. **Líneas máximo 65 caracteres.**
+6. **Una tarea por pantalla** durante las lecciones.
+
+## Modelo de datos
+
+8 tablas principales:
+
+- `profiles` — perfil de cada usuario (rol, nombre, nivel CEFR)
+- `user_preferences` — configuración del Panel de Batería Cognitiva
+- `lessons` — lecciones por nivel del MCER (A1/A2/B1/B2)
+- `tasks` — micro-tareas dentro de cada lección
+- `student_progress` — registro de cada intento de cada tarea
+- `session_logs` — sesiones de aprendizaje y `focus_breaks` del Modo Enfoque
+- `classroom_memberships` — relación docente ↔ estudiantes
+- `parent_student_links` — relación padre/madre ↔ hijo/a
+
+Todas con RLS activa. Un docente solo ve estudiantes de sus aulas; un padre solo ve sus hijos vinculados; un estudiante solo ve sus propios datos.
 
 ## Próximas fases
 
-- **Fase 2 — Backend.** Schema de Supabase, RLS policies, autenticación con `@supabase/ssr`, sincronización de preferencias cognitivas.
-- **Fase 3 — Módulo del estudiante.** Lesson runner, micro-tareas (vocab/gramática/listening/reading), `FocusShield`.
-- **Fase 4 — Módulo del docente.** Dashboard con progreso en tiempo real, gestión de lecciones, vista por estudiante.
+- **Fase 3 — Módulo del estudiante.** Lesson runner, micro-tareas (vocab/grammar/listening/reading), `FocusShield`.
+- **Fase 4 — Módulo del docente.** Dashboard con progreso real, gestión de lecciones, vista por estudiante.
 - **Fase 5 — Contenido y pulido.** Seed con 3 lecciones A1, guía de mediación, PWA básica, optimizaciones de performance.
 
 ## Licencia
 
 Por definir.
-# calma-app

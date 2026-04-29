@@ -1,8 +1,21 @@
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
+import { getUserRole, dashboardPathForRole } from '@/lib/supabase/queries';
 import { CognitiveBatteryPanel } from '@/components/settings/CognitiveBatteryPanel';
 import { Button } from '@/components/ui/Button';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let dashboardHref: string | null = null;
+  if (user) {
+    const role = await getUserRole(supabase, user.id);
+    dashboardHref = dashboardPathForRole(role);
+  }
+
   return (
     <>
       <CognitiveBatteryPanel />
@@ -19,13 +32,31 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link href="/showcase">
-              <Button size="lg">Ver el sistema de diseño</Button>
-            </Link>
+            {dashboardHref ? (
+              <Link href={dashboardHref}>
+                <Button size="lg">Ir a mi panel</Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/signup">
+                  <Button size="lg">Crear cuenta</Button>
+                </Link>
+                <Link href="/login">
+                  <Button size="lg" variant="secondary">
+                    Iniciar sesión
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
-          <p className="mt-12 text-sm text-text-muted">
-            Fase 1 — Sistema de diseño · Próxima fase: backend y autenticación
+          <p className="mt-8">
+            <Link
+              href="/showcase"
+              className="text-sm text-text-secondary hover:text-text-primary underline transition-colors"
+            >
+              Ver el sistema de diseño
+            </Link>
           </p>
         </div>
       </main>

@@ -1,6 +1,6 @@
 {
   "name": "calma-app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,13 +10,15 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.46.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.460.0",
     "next": "14.2.18",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "zustand": "^5.0.2",
-    "lucide-react": "^0.460.0",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.4"
+    "tailwind-merge": "^2.5.4",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
