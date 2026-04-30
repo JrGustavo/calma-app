@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { getUserRole, dashboardPathForRole } from '@/lib/supabase/queries';
 import { CognitiveBatteryPanel } from '@/components/settings/CognitiveBatteryPanel';
+import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 
 export default async function HomePage() {
@@ -49,23 +50,9 @@ export default async function HomePage() {
               </>
             )}
           </div>
-
-          <p className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/showcase"
-              className="text-sm text-text-secondary hover:text-text-primary underline transition-colors"
-            >
-              Ver el sistema de diseño
-            </Link>
-            <Link
-              href="/mediation-guide"
-              className="text-sm text-text-secondary hover:text-text-primary underline transition-colors"
-            >
-              Guía de mediación
-            </Link>
-          </p>
         </div>
       </main>
+      <Footer />
     </>
   );
 }
