@@ -50,12 +50,18 @@ export default async function HomePage() {
             )}
           </div>
 
-          <p className="mt-8">
+          <p className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/showcase"
               className="text-sm text-text-secondary hover:text-text-primary underline transition-colors"
             >
               Ver el sistema de diseño
+            </Link>
+            <Link
+              href="/mediation-guide"
+              className="text-sm text-text-secondary hover:text-text-primary underline transition-colors"
+            >
+              Guía de mediación
             </Link>
           </p>
         </div>
