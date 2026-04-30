@@ -5,6 +5,7 @@ import { getUserProfile } from '@/lib/supabase/queries';
 import { CognitiveBatteryPanel } from '@/components/settings/CognitiveBatteryPanel';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { PreferencesHydrator } from '@/components/auth/PreferencesHydrator';
+import { LevelSelector } from '@/components/student/LevelSelector';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
@@ -18,7 +19,6 @@ export default async function StudentDashboard() {
   const profile = await getUserProfile(supabase, user.id);
   const level = profile?.cefr_level ?? 'A1';
 
-  // Cargar primera lección no completada del nivel actual
   const { data: lessonsData } = await supabase
     .from('lessons')
     .select('id, title, estimated_minutes')
@@ -31,7 +31,6 @@ export default async function StudentDashboard() {
     | { id: string; title: string; estimated_minutes: number }
     | undefined;
 
-  // Contar tareas completadas
   const { count: completedCount } = await supabase
     .from('student_progress')
     .select('*', { count: 'exact', head: true })
@@ -50,7 +49,10 @@ export default async function StudentDashboard() {
               <h1 className="text-3xl font-bold">
                 {profile?.display_name ?? 'Estudiante'}
               </h1>
-              <p className="text-text-secondary mt-2">Tu nivel actual: {level}</p>
+              <div className="mt-2 flex items-center gap-3 flex-wrap">
+                <p className="text-text-secondary">Tu nivel actual: {level}</p>
+                <LevelSelector userId={user.id} currentLevel={level} />
+              </div>
             </div>
             <LogoutButton />
           </header>
