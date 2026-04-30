@@ -16,6 +16,18 @@ export const metadata: Metadata = {
   applicationName: 'Calma',
   authors: [{ name: 'Calma' }],
   keywords: ['inglés', 'TDAH', 'aprendizaje', 'MCER', 'neuroinclusivo'],
+  icons: {
+    icon: '/logo.jpg',
+    apple: '/logo.jpg',
+  },
+  openGraph: {
+    title: 'Calma — Aprende inglés con calma',
+    description:
+      'Aplicación de bajo estímulo para niños con TDAH. Aprende inglés a tu propio ritmo.',
+    images: ['/logo.jpg'],
+    locale: 'es_CO',
+    type: 'website',
+  },
 };
 
 export const viewport: Viewport = {
