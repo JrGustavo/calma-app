@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { FocusShield } from '@/components/lesson/FocusShield';
+import { BreathingPause } from '@/components/lesson/BreathingPause';
+import { ConfettiBurst } from '@/components/feedback/ConfettiBurst';
 import { VocabCard } from '@/components/lesson/tasks/VocabCard';
 import { GrammarPattern } from '@/components/lesson/tasks/GrammarPattern';
 import { ListeningExercise } from '@/components/lesson/tasks/ListeningExercise';
 import { ReadingMicroText } from '@/components/lesson/tasks/ReadingMicroText';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { cn } from '@/lib/utils';
 import type {
   VocabContent,
   GrammarContent,
@@ -32,16 +32,6 @@ interface TaskRunnerProps {
   tasks: TaskRow[];
 }
 
-/**
- * TaskRunner
- *
- * Orquesta la ejecución secuencial de las micro-tareas de una lección:
- * - Una tarea visible en pantalla a la vez
- * - Pausa breve de respiración entre tareas (5s)
- * - Registro de progreso por tarea en Supabase
- * - Registro de focus_breaks por sesión
- * - Pantalla final sin gamificación
- */
 export function TaskRunner({
   studentId,
   lessonId,
@@ -53,11 +43,11 @@ export function TaskRunner({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [breathing, setBreathing] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [confettiTrigger, setConfettiTrigger] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const taskStartRef = useRef<number>(Date.now());
   const focusBreaksRef = useRef(0);
 
-  // Crear session_log al montar
   useEffect(() => {
     let cancelled = false;
     async function startSession() {
@@ -82,11 +72,9 @@ export function TaskRunner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentId, lessonId]);
 
-  // Cerrar session_log al desmontar
   useEffect(() => {
     return () => {
       if (sessionId) {
-        // Fire and forget; no async cleanup en useEffect
         supabase
           .from('session_logs')
           .update({
@@ -108,7 +96,11 @@ export function TaskRunner({
     const task = tasks[currentIndex];
     const timeSpent = Math.round((Date.now() - taskStartRef.current) / 1000);
 
-    // Registrar progreso (fire and forget)
+    if (success) {
+      setConfettiTrigger(true);
+      setTimeout(() => setConfettiTrigger(false), 1600);
+    }
+
     supabase
       .from('student_progress')
       .insert({
@@ -120,24 +112,25 @@ export function TaskRunner({
       })
       .then(() => {});
 
-    // Pausa de respiración (excepto en la última)
     const isLast = currentIndex >= tasks.length - 1;
     if (isLast) {
-      setCompleted(true);
+      setTimeout(() => setCompleted(true), success ? 1200 : 0);
       return;
     }
 
-    setBreathing(true);
-    setTimeout(() => {
-      setBreathing(false);
-      setCurrentIndex((i) => i + 1);
-      taskStartRef.current = Date.now();
-    }, 3000);
+    setTimeout(() => setBreathing(true), success ? 1200 : 0);
+  }
+
+  function continueAfterBreathing() {
+    setBreathing(false);
+    setCurrentIndex((i) => i + 1);
+    taskStartRef.current = Date.now();
   }
 
   if (completed) {
     return (
       <FocusShield onFocusBreak={handleFocusBreak} requestFullscreen={false}>
+        <ConfettiBurst trigger={confettiTrigger} />
         <main className="min-h-screen flex items-center justify-center px-6 py-12">
           <div className="max-w-prose text-center">
             <h1 className="text-3xl font-bold mb-4">Lección completa.</h1>
@@ -158,16 +151,16 @@ export function TaskRunner({
 
   return (
     <FocusShield onFocusBreak={handleFocusBreak}>
+      <ConfettiBurst trigger={confettiTrigger} />
       <main className="min-h-screen px-6 py-20">
         <div className="max-w-prose mx-auto">
-          {/* Progreso */}
           <div className="mb-8">
             <p className="text-sm text-text-muted mb-2">{lessonTitle}</p>
             <ProgressBar current={currentIndex + 1} total={tasks.length} />
           </div>
 
           {breathing ? (
-            <BreathingPause />
+            <BreathingPause onContinue={continueAfterBreathing} />
           ) : (
             <TaskByType
               task={currentTask}
@@ -179,8 +172,6 @@ export function TaskRunner({
     </FocusShield>
   );
 }
-
-// ────────────────────────────────────────────────────────────
 
 function ProgressBar({ current, total }: { current: number; total: number }) {
   const percent = (current / total) * 100;
@@ -202,15 +193,6 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
         />
       </div>
     </div>
-  );
-}
-
-function BreathingPause() {
-  return (
-    <Card className="text-center">
-      <p className="text-text-secondary mb-2">Respira un momento.</p>
-      <p className="text-sm text-text-muted">Continuamos en unos segundos.</p>
-    </Card>
   );
 }
 
@@ -251,10 +233,6 @@ function TaskByType({
         />
       );
     default:
-      return (
-        <Card>
-          <p>Tipo de tarea no reconocido.</p>
-        </Card>
-      );
+      return <div>Tipo de tarea no reconocido.</div>;
   }
 }

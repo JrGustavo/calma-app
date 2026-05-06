@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { AudioPlayer } from '@/components/lesson/AudioPlayer';
+import { TextToSpeech } from '@/components/lesson/TextToSpeech';
 import type { VocabContent, TaskResult } from './types';
 
 interface VocabCardProps {
@@ -11,19 +12,16 @@ interface VocabCardProps {
   onComplete: (result: Pick<TaskResult, 'success'>) => void;
 }
 
-/**
- * VocabCard — tarea de vocabulario.
- * Muestra palabra + traducción + audio opcional. El estudiante decide si
- * la conoce o quiere practicarla. No hay respuesta "correcta" — es
- * autoevaluación, lo cual es apropiado para vocabulario inicial.
- */
 export function VocabCard({ content, onComplete }: VocabCardProps) {
   const [revealed, setRevealed] = useState(false);
 
   return (
     <Card variant="elevated" className="text-center">
-      <p className="text-sm text-text-muted mb-2">Vocabulario</p>
-      <h2 className="text-3xl font-bold mb-6">{content.word}</h2>
+      <p className="text-sm text-text-muted mb-2">Palabra nueva</p>
+      <div className="flex items-center justify-center gap-3 mb-6">
+        <h2 className="text-3xl font-bold">{content.word}</h2>
+        <TextToSpeech text={content.word} lang="en-US" size="md" />
+      </div>
 
       {content.audio_url && (
         <div className="mb-6 max-w-sm mx-auto">

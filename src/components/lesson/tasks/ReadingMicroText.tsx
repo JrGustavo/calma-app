@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { GrammarMarker } from '@/components/lesson/GrammarMarker';
+import { TextToSpeech } from '@/components/lesson/TextToSpeech';
 import { cn } from '@/lib/utils';
 import type { ReadingContent, TaskResult } from './types';
 
@@ -22,10 +23,14 @@ export function ReadingMicroText({
   const [submitted, setSubmitted] = useState(false);
 
   const isCorrect = selected === content.correct;
+  const fullText = content.text_segments.map((s) => s.content).join('');
 
   return (
     <Card variant="elevated">
-      <p className="text-sm text-text-muted mb-2">Lectura</p>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <p className="text-sm text-text-muted">Lee y descubre</p>
+        <TextToSpeech text={fullText} lang="en-US" />
+      </div>
 
       <div className="text-lg leading-relaxed mb-6 max-w-prose">
         {content.text_segments.map((seg, i) =>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { AudioPlayer } from '@/components/lesson/AudioPlayer';
+import { TextToSpeech } from '@/components/lesson/TextToSpeech';
 import { cn } from '@/lib/utils';
 import type { ListeningContent, TaskResult } from './types';
 
@@ -23,11 +24,18 @@ export function ListeningExercise({
 
   return (
     <Card variant="elevated">
-      <p className="text-sm text-text-muted mb-2">Comprensión auditiva</p>
+      <p className="text-sm text-text-muted mb-2">¿Qué escuchas?</p>
 
-      <div className="mb-6">
-        <AudioPlayer src={content.audio_url} label="Escucha con atención" />
-      </div>
+      {content.audio_url ? (
+        <div className="mb-6">
+          <AudioPlayer src={content.audio_url} label="Escucha con atención" />
+        </div>
+      ) : (
+        <div className="mb-6 p-4 bg-bg-elevated border border-border rounded-md flex items-center justify-between gap-3">
+          <p className="text-sm text-text-secondary">Audio del prompt</p>
+          <TextToSpeech text={content.prompt} lang="en-US" size="md" />
+        </div>
+      )}
 
       <p className="font-medium mb-3">{content.prompt}</p>
 
@@ -35,23 +43,25 @@ export function ListeningExercise({
         {content.options.map((option) => {
           const isSelected = option === selected;
           return (
-            <button
-              key={option}
-              type="button"
-              role="radio"
-              aria-checked={isSelected}
-              disabled={submitted}
-              onClick={() => setSelected(option)}
-              className={cn(
-                'w-full text-left p-3 rounded-md border transition-colors min-h-[44px]',
-                isSelected
-                  ? 'bg-bg-elevated border-text-secondary'
-                  : 'bg-bg-primary border-border hover:bg-bg-alt',
-                submitted && 'cursor-not-allowed opacity-70'
-              )}
-            >
-              {option}
-            </button>
+            <div key={option} className="flex items-center gap-2">
+              <button
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                disabled={submitted}
+                onClick={() => setSelected(option)}
+                className={cn(
+                  'flex-1 text-left p-3 rounded-md border transition-colors min-h-[44px]',
+                  isSelected
+                    ? 'bg-bg-elevated border-text-secondary'
+                    : 'bg-bg-primary border-border hover:bg-bg-alt',
+                  submitted && 'cursor-not-allowed opacity-70'
+                )}
+              >
+                {option}
+              </button>
+              <TextToSpeech text={option} lang="en-US" />
+            </div>
           );
         })}
       </div>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getUserProfile } from '@/lib/supabase/queries';
 import { CognitiveBatteryPanel } from '@/components/settings/CognitiveBatteryPanel';
@@ -9,15 +10,21 @@ import { LevelSelector } from '@/components/student/LevelSelector';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return '¡Buenos días';
+  if (hour < 19) return '¡Buenas tardes';
+  return '¡Buenas noches';
+}
+
 export default async function StudentDashboard() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   const profile = await getUserProfile(supabase, user.id);
   const level = profile?.cefr_level ?? 'A1';
+  const greeting = getGreeting();
 
   const { data: lessonsData } = await supabase
     .from('lessons')
@@ -45,9 +52,9 @@ export default async function StudentDashboard() {
         <div className="max-w-prose mx-auto space-y-8">
           <header className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm text-text-muted mb-1">Hola,</p>
+              <p className="text-sm text-text-muted mb-1">{greeting},</p>
               <h1 className="text-3xl font-bold">
-                {profile?.display_name ?? 'Estudiante'}
+                {profile?.display_name ?? 'Estudiante'}!
               </h1>
               <div className="mt-2 flex items-center gap-3 flex-wrap">
                 <p className="text-text-secondary">Tu nivel actual: {level}</p>
@@ -58,15 +65,22 @@ export default async function StudentDashboard() {
           </header>
 
           <Card variant="elevated">
-            <h2 className="text-lg font-bold mb-2">Tu próxima lección</h2>
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-5 h-5 text-text-secondary" strokeWidth={1.75} />
+              <h2 className="text-lg font-bold">Reto de hoy</h2>
+            </div>
+            <p className="text-text-secondary mb-4">3 bloques de 6 min</p>
+
             {nextLesson ? (
               <>
                 <p className="text-text-primary mb-1">{nextLesson.title}</p>
                 <p className="text-sm text-text-muted mb-4">
-                  {nextLesson.estimated_minutes} min aprox.
+                  Bloque 1 · {nextLesson.estimated_minutes} min aprox.
                 </p>
                 <Link href={`/student/lesson/${level}/${nextLesson.id}`}>
-                  <Button size="lg">Empezar</Button>
+                  <Button size="lg" className="animate-gentle-pulse">
+                    Empezar
+                  </Button>
                 </Link>
               </>
             ) : (

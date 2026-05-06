@@ -4,13 +4,10 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { GrammarMarker } from '@/components/lesson/GrammarMarker';
+import { TextToSpeech } from '@/components/lesson/TextToSpeech';
 import { cn } from '@/lib/utils';
-import type {
-  GrammarContent,
-  TaskResult,
-} from './types';
+import type { GrammarContent, TaskResult } from './types';
 
-// Re-exportar para evitar import circular
 type GrammarMarkerType_ = Parameters<typeof GrammarMarker>[0]['type'];
 
 interface GrammarPatternProps {
@@ -18,20 +15,19 @@ interface GrammarPatternProps {
   onComplete: (result: Pick<TaskResult, 'success'>) => void;
 }
 
-/**
- * GrammarPattern — tarea de gramática.
- * Muestra una oración con marcadores gramaticales (azul petróleo) y pide
- * al estudiante identificar el patrón correcto entre 2-3 opciones.
- */
 export function GrammarPattern({ content, onComplete }: GrammarPatternProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const isCorrect = selected === content.correct;
+  const fullSentence = content.sentence_segments.map((s) => s.content).join('');
 
   return (
     <Card variant="elevated">
-      <p className="text-sm text-text-muted mb-2">Gramática</p>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <p className="text-sm text-text-muted">¿Cómo se dice?</p>
+        <TextToSpeech text={fullSentence} lang="en-US" />
+      </div>
 
       <div className="text-xl leading-relaxed mb-6 max-w-prose">
         {content.sentence_segments.map((seg, i) =>
@@ -86,34 +82,26 @@ export function GrammarPattern({ content, onComplete }: GrammarPatternProps) {
           Verificar
         </Button>
       ) : (
-        <Feedback isCorrect={isCorrect} onContinue={() => onComplete({ success: isCorrect })} />
+        <div>
+          <p
+            className={cn(
+              'mb-4 px-3 py-2 rounded-md border-l-2',
+              isCorrect
+                ? 'bg-bg-alt border-success-muted'
+                : 'bg-bg-alt border-warning-muted'
+            )}
+          >
+            {isCorrect ? '¡Correcto!' : 'Vamos a revisarlo juntos.'}
+          </p>
+          <Button
+            size="lg"
+            onClick={() => onComplete({ success: isCorrect })}
+            className="w-full"
+          >
+            Continuar
+          </Button>
+        </div>
       )}
     </Card>
-  );
-}
-
-function Feedback({
-  isCorrect,
-  onContinue,
-}: {
-  isCorrect: boolean;
-  onContinue: () => void;
-}) {
-  return (
-    <div>
-      <p
-        className={cn(
-          'mb-4 px-3 py-2 rounded-md border-l-2',
-          isCorrect
-            ? 'bg-bg-alt border-success-muted'
-            : 'bg-bg-alt border-warning-muted'
-        )}
-      >
-        {isCorrect ? '¡Correcto!' : 'Vamos a revisarlo juntos.'}
-      </p>
-      <Button size="lg" onClick={onContinue} className="w-full">
-        Continuar
-      </Button>
-    </div>
   );
 }
