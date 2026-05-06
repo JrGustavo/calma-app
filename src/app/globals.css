@@ -3,41 +3,48 @@
 @tailwind utilities;
 
 /* ============================================================
-   Calma Design System
-   Low-stimulus palette for ADHD-friendly learning
+   Calma Design System — Premium Edition
+   Low-stimulus pero con vida y armonía cromática
    ============================================================ */
 
 :root {
   /* Backgrounds — NEVER pure white */
-  --bg-primary: #F5F1E8;
-  --bg-secondary: #ECE8DD;
-  --bg-alt: #E8E8E5;
-  --bg-elevated: #EFEAE0;
+  --bg-primary: #F8F4EA;
+  --bg-secondary: #F0EBDD;
+  --bg-alt: #ECE6D5;
+  --bg-elevated: #FAF6EC;
+  --bg-warm: #F5EAD8;
 
-  /* Text — NEVER pure black */
+  /* Text */
   --text-primary: #2C2C2C;
   --text-secondary: #5A5A5A;
-  --text-muted: #7A7A7A;
+  --text-muted: #8A8275;
 
-  /* Petroleum Blue — RESERVED for grammar markers ONLY */
+  /* Petroleum Blue — RESERVED for grammar markers + brand decoration */
   --grammar-marker: #1F4E5F;
   --grammar-marker-hover: #2C6478;
   --grammar-marker-bg: rgba(31, 78, 95, 0.08);
 
-  /* Semantic colors — desaturated, sparing use */
+  /* Accent palette — solo para landing/decorativo, pasteles armónicos */
+  --accent-sage: #9FB48C;        /* Verde salvia para "Respira" */
+  --accent-sage-bg: #DCE8D2;
+  --accent-terracotta: #D4A574;  /* Terracota para "Lecciones" */
+  --accent-terracotta-bg: #F0DFC4;
+  --accent-rose: #C99B8E;        /* Rosa polvo para "Logros" */
+  --accent-rose-bg: #ECD9D2;
+
+  /* Semantic colors */
   --success-muted: #6B8E6F;
   --warning-muted: #B8860B;
-  --border-subtle: #D4CFC4;
+  --border-subtle: #E0D9C8;
   --border-default: #C4BFB4;
 
-  /* System accent (Focus Mode indicator) — same as grammar marker */
   --system-accent: #1F4E5F;
 
   /* Cognitive battery defaults */
   --font-scale: 1;
 }
 
-/* Contrast modes (controlled by data-contrast attribute on <html>) */
 [data-contrast="medium"] {
   --bg-primary: #F0EBDD;
   --bg-secondary: #E5E0D2;
@@ -55,7 +62,6 @@
   --border-subtle: #A8A398;
 }
 
-/* Reduce motion — disables transitions and animations */
 [data-reduce-motion="true"] *,
 [data-reduce-motion="true"] *::before,
 [data-reduce-motion="true"] *::after {
@@ -65,7 +71,6 @@
   scroll-behavior: auto !important;
 }
 
-/* Respect system-level preference */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -75,7 +80,6 @@
   }
 }
 
-/* Base styles */
 html {
   background-color: var(--bg-primary);
   color: var(--text-primary);
@@ -90,56 +94,145 @@ body {
   min-height: 100vh;
 }
 
-/* Selection styling — neutral, not jarring */
+/* Display font para títulos hero */
+.font-display {
+  font-family: var(--font-fraunces), 'Atkinson Hyperlegible', serif;
+  font-feature-settings: 'ss01', 'ss02';
+  letter-spacing: -0.02em;
+}
+
+/* Landing background — degradado animado tibio */
+.landing-bg {
+  background: linear-gradient(
+    135deg,
+    var(--bg-primary) 0%,
+    var(--bg-warm) 40%,
+    var(--bg-secondary) 70%,
+    var(--bg-elevated) 100%
+  );
+  background-size: 300% 300%;
+  animation: gentle-gradient 25s ease-in-out infinite;
+}
+
+@keyframes gentle-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+[data-reduce-motion="true"] .landing-bg {
+  animation: none;
+  background: var(--bg-primary);
+}
+
 ::selection {
   background-color: var(--bg-elevated);
   color: var(--text-primary);
 }
 
-/* Confetti burst animation — para feedback de éxito */
+/* Confetti */
 @keyframes confetti-fall {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(var(--tx, 0), 200px) rotate(720deg);
-    opacity: 0;
-  }
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--tx, 0), 200px) rotate(720deg); opacity: 0; }
 }
-
 .animate-confetti-fall {
   animation: confetti-fall 1.4s ease-out forwards;
 }
 
-/* Breathing animation — círculo que se expande/contrae */
+/* Breathing */
 @keyframes breathing {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(2); }
 }
-
 .animate-breathing {
   animation: breathing 8s ease-in-out infinite;
 }
 
-/* Gentle pulse — micro-animación sutil para CTA principal */
+/* Gentle pulse */
 @keyframes gentle-pulse {
   0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(90, 90, 90, 0); }
   50% { transform: scale(1.02); box-shadow: 0 0 0 4px rgba(90, 90, 90, 0.05); }
 }
-
 .animate-gentle-pulse {
   animation: gentle-pulse 3s ease-in-out infinite;
 }
 
-/* Focus visible — clear but not garish */
+/* Soft float */
+@keyframes soft-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-soft-float {
+  animation: soft-float 6s ease-in-out infinite;
+}
+
+/* Cloud drift */
+@keyframes cloud-drift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-25px); }
+}
+.animate-cloud-drift {
+  animation: cloud-drift 35s ease-in-out infinite;
+}
+
+/* Leaf sway */
+@keyframes leaf-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+.animate-leaf-sway {
+  animation: leaf-sway 9s ease-in-out infinite;
+}
+
+/* Flower bob */
+@keyframes flower-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(3deg); }
+}
+.animate-flower-bob {
+  animation: flower-bob 5s ease-in-out infinite;
+}
+
+/* Slow rotate para elementos decorativos */
+@keyframes slow-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-slow-rotate {
+  animation: slow-rotate 60s linear infinite;
+}
+
+/* Fade in stagger */
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in-up 0.7s ease-out backwards;
+}
+
+/* Sombras suaves */
+.shadow-soft {
+  box-shadow:
+    0 4px 16px -4px rgba(60, 50, 30, 0.08),
+    0 2px 6px -2px rgba(60, 50, 30, 0.04);
+}
+.shadow-warm {
+  box-shadow:
+    0 8px 24px -8px rgba(180, 140, 90, 0.15),
+    0 4px 8px -2px rgba(60, 50, 30, 0.06);
+}
+.shadow-card {
+  box-shadow:
+    0 1px 2px rgba(60, 50, 30, 0.04),
+    0 4px 16px -4px rgba(60, 50, 30, 0.08);
+}
+
+/* Focus visible */
 *:focus-visible {
   outline: 2px solid var(--text-secondary);
   outline-offset: 2px;
   border-radius: 2px;
 }
-
-/* Disable focus ring on mouse use */
 *:focus:not(:focus-visible) {
   outline: none;
 }

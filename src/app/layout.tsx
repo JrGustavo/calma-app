@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Atkinson_Hyperlegible } from 'next/font/google';
+import { Atkinson_Hyperlegible, Fraunces } from 'next/font/google';
 import './globals.css';
 
 const atkinson = Atkinson_Hyperlegible({
@@ -7,6 +7,13 @@ const atkinson = Atkinson_Hyperlegible({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-atkinson',
+});
+
+const fraunces = Fraunces({
+  weight: ['400', '600', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-fraunces',
 });
 
 export const metadata: Metadata = {
@@ -34,7 +41,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#F5F1E8',
+  themeColor: '#F8F4EA',
 };
 
 export default function RootLayout({
@@ -47,7 +54,7 @@ export default function RootLayout({
       lang="es"
       data-contrast="soft"
       data-reduce-motion="false"
-      className={atkinson.variable}
+      className={`${atkinson.variable} ${fraunces.variable}`}
     >
       <body className="bg-bg-primary text-text-primary antialiased font-sans">
         {children}

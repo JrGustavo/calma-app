@@ -133,7 +133,7 @@ export default function ZonaPadresPage() {
                 seguidos.
               </li>
               <li>
-                El &ldquo;Modo Enfoque&rdquo; es un andamiaje
+                El "Modo Enfoque" es un andamiaje, no un control parental.
                 Para bloqueo total de pestañas/apps, considera software
                 especializado.
               </li>
